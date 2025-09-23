@@ -1,0 +1,406 @@
+/* Shop Window Design System - CSS Custom Properties */
+/* Bold Data-Driven Aesthetic - Professional CRE Platform */
+
+:root {
+  /* Font System */
+  --font-family-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+  
+  /* Color System - Bold Data-Driven */
+  --color-primary: #1a365d;
+  --color-primary-hover: #2c5aa0;
+  --color-primary-active: #153048;
+  --color-primary-light: #4a90e2;
+  
+  /* Two-Mode System Colors */
+  --color-scenario: #f39c12;
+  --color-scenario-hover: #e67e22;
+  --color-scenario-active: #d68910;
+  --color-scenario-bg: #fff9e6;
+  --color-scenario-border: #f7dc6f;
+  
+  /* Neutral Palette */
+  --color-neutral-50: #f7fafc;
+  --color-neutral-100: #edf2f7;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e0;
+  --color-neutral-400: #a0aec0;
+  --color-neutral-500: #718096;
+  --color-neutral-600: #4a5568;
+  --color-neutral-700: #2d3748;
+  --color-neutral-800: #1a202c;
+  --color-neutral-900: #171923;
+  
+  /* Status Colors */
+  --color-success: #38a169;
+  --color-success-bg: #f0fff4;
+  --color-warning: #d69e2e;
+  --color-warning-bg: #fffaf0;
+  --color-error: #e53e3e;
+  --color-error-bg: #fed7d7;
+  --color-info: #3182ce;
+  --color-info-bg: #ebf8ff;
+  
+  /* Admin Portal Colors */
+  --color-admin: #e53e3e;
+  --color-admin-hover: #c53030;
+  --color-admin-bg: #fed7d7;
+  
+  /* Typography Scale (Desktop Optimized) */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 28px;
+  --font-size-4xl: 32px;
+  
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+  
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Spacing System (8-point Grid) */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-base: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 50%;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Transitions */
+  --transition-fast: 0.1s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+  
+  /* Layout Constraints (Desktop Focus) */
+  --container-max-width: 1400px;
+  --container-min-width: 1024px;
+  --sidebar-width: 350px;
+  --header-height: 64px;
+  
+  /* Component-Specific Spacing */
+  --padding-button: var(--space-2) var(--space-4);
+  --padding-button-sm: var(--space-1) var(--space-3);
+  --padding-button-lg: var(--space-3) var(--space-6);
+  --padding-card: var(--space-6);
+  --padding-form-field: var(--space-3) var(--space-4);
+}
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-neutral-800);
+  background-color: var(--color-neutral-50);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Button Base Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--padding-button);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  text-decoration: none;
+  border: none;
+  border-radius: var(--radius-base);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn:focus {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+/* Button Variants */
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:active {
+  background: var(--color-primary-active);
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-scenario {
+  background: var(--color-scenario);
+  color: white;
+}
+
+.btn-scenario:hover:not(:disabled) {
+  background: var(--color-scenario-hover);
+  transform: translateY(-1px);
+}
+
+.btn-admin {
+  background: var(--color-admin);
+  color: white;
+}
+
+.btn-admin:hover:not(:disabled) {
+  background: var(--color-admin-hover);
+  transform: translateY(-1px);
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: var(--padding-button-sm);
+  font-size: var(--font-size-sm);
+}
+
+.btn-lg {
+  padding: var(--padding-button-lg);
+  font-size: var(--font-size-lg);
+}
+
+/* Form Controls */
+.form-control {
+  display: block;
+  width: 100%;
+  padding: var(--padding-form-field);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-neutral-800);
+  background: white;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-base);
+  transition: all var(--transition-base);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+}
+
+.form-control:disabled {
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-500);
+  cursor: not-allowed;
+}
+
+.form-control.error {
+  border-color: var(--color-error);
+}
+
+/* Cards */
+.card {
+  background: white;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-neutral-200);
+  background: var(--color-neutral-50);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-700);
+}
+
+.card-body {
+  padding: var(--space-5);
+}
+
+.card-footer {
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-neutral-200);
+  background: var(--color-neutral-50);
+}
+
+/* Property Card Specific */
+.property-card {
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+
+.property-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary-light);
+}
+
+.property-card.scenario-mode {
+  background: var(--color-scenario-bg);
+  border-color: var(--color-scenario-border);
+}
+
+/* Editable Metrics (Scenario Mode) */
+.metric.editable {
+  background: rgba(243, 156, 18, 0.1);
+  border: 1px dashed var(--color-scenario);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  position: relative;
+}
+
+.metric.editable:hover {
+  background: rgba(243, 156, 18, 0.15);
+  border-color: var(--color-scenario-hover);
+}
+
+.metric.editable::after {
+  content: '✎';
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  color: var(--color-scenario);
+  font-size: var(--font-size-xs);
+}
+
+/* Navigation Tabs */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-neutral-200);
+  background: white;
+}
+
+.tab {
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neutral-600);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-base);
+}
+
+.tab:hover {
+  color: var(--color-primary);
+  background: rgba(26, 54, 93, 0.05);
+}
+
+.tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  background: rgba(26, 54, 93, 0.05);
+}
+
+/* Map Marker Styles */
+.property-marker {
+  width: 12px;
+  height: 12px;
+  background: var(--color-primary);
+  border: 2px solid white;
+  border-radius: var(--radius-full);
+  box-shadow: 0 2px 8px rgba(44, 90, 160, 0.3);
+  transition: all var(--transition-base);
+}
+
+.property-marker:hover {
+  transform: scale(1.2);
+  z-index: 10;
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+.text-primary { color: var(--color-primary); }
+.text-scenario { color: var(--color-scenario); }
+.text-neutral-600 { color: var(--color-neutral-600); }
+.text-neutral-800 { color: var(--color-neutral-800); }
+
+.bg-white { background-color: white; }
+.bg-neutral-50 { background-color: var(--color-neutral-50); }
+
+.rounded { border-radius: var(--radius-base); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+
+/* Responsive Utilities (Desktop Focus) */
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 300px;
+    --padding-card: var(--space-4);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 100%;
+    --font-size-3xl: 24px;
+    --font-size-2xl: 20px;
+    --padding-card: var(--space-3);
+  }
+}
