@@ -86,6 +86,9 @@ export const useModeContext = (): ModeContextType => {
   return context;
 };
 
+// Export with alternative name for backward compatibility
+export const useMode = useModeContext;
+
 // Export the context itself for advanced usage
 export { ModeContext };
 
