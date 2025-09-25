@@ -1,0 +1,1 @@
+export { mockApi, propertiesApi, tenantsApi, API_CONFIG, getApiService } from './mockApi';
