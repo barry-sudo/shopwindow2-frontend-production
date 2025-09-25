@@ -1,206 +1,228 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Wrapper } from '@googlemaps/react-wrapper';
 import { Map } from '../components/map/Map';
+import { MapErrorBoundary } from '../components/common/MapErrorBoundary';
 import { PropertyCard } from '../components/property/PropertyCard';
-import { SearchBar } from '../components/common/SearchBar';
 import { FilterPanel } from '../components/property/FilterPanel';
-import { LoadingSpinner } from '../components/common/LoadingSpinner';
-import { ErrorMessage } from '../components/common/ErrorMessage';
-import { propertiesApi } from '../services/mockApi';
-import { useMode } from '../contexts/ModeContext';
-import { Property, PropertyFilters, Coordinates, ApiError } from '../types/models';
+import { useModeContext } from '../contexts/ModeContext';
 
-// Default map center - Wilmington, DE area (our primary market)
-const DEFAULT_CENTER: Coordinates = { lat: 39.7391, lng: -75.6918 };
-const DEFAULT_ZOOM = 11;
+// Import your API service (adjust path as needed)
+// import { apiService } from '../services/api';
+
+// Mock data for development - replace with actual API call
+const mockProperties = [
+  {
+    id: '1',
+    name: 'Philadelphia Premium Outlets',
+    address: '18 West Lightcap Road, Pottstown, PA 19464',
+    location: { coordinates: [-75.6224, 40.2732] },
+    square_footage: 850000,
+    occupancy_rate: 0.92,
+    data_quality_score: 85,
+    tenant_count: 120,
+    anchor_tenants: ['Nike', 'Coach', 'Kate Spade']
+  },
+  {
+    id: '2', 
+    name: 'King of Prussia Mall',
+    address: '160 N Gulph Rd, King of Prussia, PA 19406',
+    location: { coordinates: [-75.3896, 40.0892] },
+    square_footage: 2900000,
+    occupancy_rate: 0.96,
+    data_quality_score: 95,
+    tenant_count: 450,
+    anchor_tenants: ['Nordstrom', 'Macy\'s', 'Bloomingdale\'s']
+  },
+  {
+    id: '3',
+    name: 'Cherry Hill Mall',
+    address: '2000 RT-38, Cherry Hill, NJ 08002',
+    location: { coordinates: [-75.0308, 39.9343] },
+    square_footage: 1200000,
+    occupancy_rate: 0.88,
+    data_quality_score: 78,
+    tenant_count: 160,
+    anchor_tenants: ['Macy\'s', 'JCPenney', 'Barnes & Noble']
+  },
+  {
+    id: '4',
+    name: 'Deptford Mall',
+    address: '1750 Deptford Center Rd, Deptford Township, NJ 08096',
+    location: { coordinates: [-75.1190, 39.8176] },
+    square_footage: 900000,
+    occupancy_rate: 0.84,
+    data_quality_score: 72,
+    tenant_count: 110,
+    anchor_tenants: ['Macy\'s', 'Boscov\'s', 'AMC']
+  },
+  {
+    id: '5',
+    name: 'Willow Grove Park Mall',
+    address: '2500 W Moreland Rd, Willow Grove, PA 19090',
+    location: { coordinates: [-75.1157, 40.1440] },
+    square_footage: 1100000,
+    occupancy_rate: 0.90,
+    data_quality_score: 82,
+    tenant_count: 140,
+    anchor_tenants: ['Macy\'s', 'JCPenney', 'Dick\'s Sporting Goods']
+  }
+];
+
+interface Property {
+  id: string;
+  name: string;
+  address: string;
+  location: {
+    coordinates: [number, number];
+  };
+  square_footage?: number;
+  occupancy_rate?: number;
+  data_quality_score: number;
+  tenant_count?: number;
+  anchor_tenants?: string[];
+}
+
+interface Filters {
+  searchTerm: string;
+  minSquareFootage?: number;
+  maxSquareFootage?: number;
+  minOccupancy?: number;
+  minDataQuality?: number;
+}
 
 export const MapView: React.FC = () => {
   const navigate = useNavigate();
-  const { mode } = useMode();
+  const { isVerifiedMode } = useModeContext();
   
   // State management
   const [properties, setProperties] = useState<Property[]>([]);
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-  const [filters, setFilters] = useState<PropertyFilters>({});
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<ApiError | null>(null);
-  const [mapCenter, setMapCenter] = useState<Coordinates>(DEFAULT_CENTER);
-  const [mapZoom, setMapZoom] = useState<number>(DEFAULT_ZOOM);
+  const [filters, setFilters] = useState<Filters>({ searchTerm: '' });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showSidebar, setShowSidebar] = useState(true);
 
   // Load properties data
-  const loadProperties = useCallback(async (appliedFilters?: PropertyFilters) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await propertiesApi.getAll(appliedFilters);
-      setProperties(response.data.results);
-      
-      console.log(`📍 Loaded ${response.data.results.length} properties in ${mode} mode`);
-    } catch (err) {
-      const apiError: ApiError = {
-        message: err instanceof Error ? err.message : 'Failed to load properties',
-        status_code: 500
-      };
-      setError(apiError);
-      console.error('Error loading properties:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [mode]);
+  useEffect(() => {
+    const loadProperties = async () => {
+      try {
+        setIsLoading(true);
+        console.log(`🔄 Loading properties in ${isVerifiedMode ? 'Verified' : 'Scenario'} mode...`);
+        
+        // For development, use mock data
+        // In production, replace with actual API call:
+        // const response = await apiService.getShoppingCenters();
+        // setProperties(response.results);
+        
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        setProperties(mockProperties);
+        console.log(`✅ Loaded ${mockProperties.length} properties in ${isVerifiedMode ? 'Verified' : 'Scenario'} mode`);
+        
+      } catch (err) {
+        console.error('❌ Error loading properties:', err);
+        setError('Failed to load properties. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // Handle search
-  const handleSearch = useCallback(async (query: string) => {
-    setSearchQuery(query);
-    
-    if (query.trim()) {
-      const searchFilters: PropertyFilters = { ...filters, search_query: query };
-      await loadProperties(searchFilters);
-    } else {
-      await loadProperties(filters);
-    }
-  }, [filters, loadProperties]);
+    loadProperties();
+  }, [isVerifiedMode]);
 
-  // Handle filter changes
-  const handleFilterChange = useCallback(async (newFilters: PropertyFilters) => {
-    setFilters(newFilters);
-    const searchFilters = searchQuery ? { ...newFilters, search_query: searchQuery } : newFilters;
-    await loadProperties(searchFilters);
-  }, [searchQuery, loadProperties]);
+  // Filter properties based on current filters
+  const applyFilters = useMemo(() => {
+    return properties.filter(property => {
+      // Search term filter
+      if (filters.searchTerm) {
+        const searchLower = filters.searchTerm.toLowerCase();
+        const matchesSearch = 
+          property.name.toLowerCase().includes(searchLower) ||
+          property.address.toLowerCase().includes(searchLower) ||
+          property.anchor_tenants?.some(tenant => 
+            tenant.toLowerCase().includes(searchLower)
+          );
+        if (!matchesSearch) return false;
+      }
+
+      // Square footage filters
+      if (filters.minSquareFootage && property.square_footage && 
+          property.square_footage < filters.minSquareFootage) return false;
+      if (filters.maxSquareFootage && property.square_footage && 
+          property.square_footage > filters.maxSquareFootage) return false;
+
+      // Occupancy filter
+      if (filters.minOccupancy && property.occupancy_rate && 
+          property.occupancy_rate < filters.minOccupancy / 100) return false;
+
+      // Data quality filter
+      if (filters.minDataQuality && 
+          property.data_quality_score < filters.minDataQuality) return false;
+
+      return true;
+    });
+  }, [properties, filters]);
+
+  // Update filtered properties when filters change
+  useEffect(() => {
+    setFilteredProperties(applyFilters);
+    console.log(`📊 Applied filters: ${applyFilters.length} of ${properties.length} properties match`);
+  }, [applyFilters, properties.length]);
 
   // Handle property selection
-  const handlePropertySelect = useCallback((property: Property) => {
+  const handlePropertyClick = (property: Property) => {
+    console.log('🎯 Property clicked:', property.name);
     setSelectedProperty(property);
-    setMapCenter(property.coordinates);
-    setMapZoom(15); // Zoom in when selecting a property
-  }, []);
+  };
 
-  // Handle property card click (navigate to detail view)
-  const handlePropertyCardClick = useCallback((property: Property) => {
-    navigate(`/property/${property.id}`);
-  }, [navigate]);
+  // Handle property detail view
+  const handleViewDetails = (propertyId: string) => {
+    navigate(`/property/${propertyId}`);
+  };
 
-  // Handle map bounds change (for future optimization)
-  const handleMapBoundsChange = useCallback((bounds: google.maps.LatLngBounds) => {
-    // Future enhancement: Load only properties within visible bounds
-    console.log('Map bounds changed:', bounds.toJSON());
-  }, []);
+  // Map center calculation
+  const mapCenter = useMemo(() => {
+    if (filteredProperties.length === 0) {
+      return { lat: 39.9526, lng: -75.1652 }; // Philadelphia default
+    }
 
-  // Initial load
-  useEffect(() => {
-    loadProperties();
-  }, [loadProperties]);
+    const avgLat = filteredProperties.reduce((sum, p) => 
+      sum + p.location.coordinates[1], 0) / filteredProperties.length;
+    const avgLng = filteredProperties.reduce((sum, p) => 
+      sum + p.location.coordinates[0], 0) / filteredProperties.length;
 
-  // Render error state
-  if (error && !loading) {
+    return { lat: avgLat, lng: avgLng };
+  }, [filteredProperties]);
+
+  if (isLoading) {
     return (
-      <div className="map-view error-state">
-        <div className="error-container">
-          <ErrorMessage 
-            title="Failed to Load Properties"
-            message={error.message}
-            onRetry={() => loadProperties()}
-          />
+      <div className="map-view loading" style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        backgroundColor: '#f7fafc'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '4px solid #e2e8f0',
+            borderTop: '4px solid #1a365d',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }} />
+          <p style={{ color: '#4a5568', fontSize: '16px', margin: 0 }}>
+            Loading properties...
+          </p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="map-view">
-      {/* Search and Filter Controls */}
-      <div className="map-controls">
-        <div className="controls-container">
-          <div className="search-section">
-            <SearchBar
-              value={searchQuery}
-              onSearch={handleSearch}
-              placeholder="Search properties, locations, or owners..."
-              className="property-search"
-            />
-          </div>
-          
-          <FilterPanel
-            filters={filters}
-            onFiltersChange={handleFilterChange}
-            totalProperties={properties.length}
-            className="map-filters"
-          />
-        </div>
-      </div>
-
-      {/* Main Map and Property Display */}
-      <div className="map-content">
-        {/* Google Map */}
-        <div className="map-container">
-          {loading ? (
-            <div className="map-loading">
-              <LoadingSpinner size="large" message="Loading properties..." />
-            </div>
-          ) : (
-            <Wrapper 
-              apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY || ''}
-              render={(status) => {
-                if (status === 'LOADING') return <LoadingSpinner message="Loading map..." />;
-                if (status === 'FAILURE') return <ErrorMessage title="Map failed to load" message="Check Google Maps API key configuration" />;
-                return null;
-              }}
-            >
-              <Map
-                center={mapCenter}
-                zoom={mapZoom}
-                properties={properties}
-                selectedProperty={selectedProperty}
-                onPropertySelect={handlePropertySelect}
-                onBoundsChanged={handleMapBoundsChange}
-                mode={mode}
-              />
-            </Wrapper>
-          )}
-        </div>
-
-        {/* Selected Property Card */}
-        {selectedProperty && !loading && (
-          <div className="property-sidebar">
-            <div className="selected-property">
-              <div className="sidebar-header">
-                <h3>Selected Property</h3>
-                <button 
-                  className="close-button"
-                  onClick={() => setSelectedProperty(null)}
-                  aria-label="Close property details"
-                >
-                  ×
-                </button>
-              </div>
-              
-              <PropertyCard
-                property={selectedProperty}
-                mode={mode}
-                onClick={() => handlePropertyCardClick(selectedProperty)}
-                className="selected-property-card"
-              />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Properties Summary */}
-      <div className="map-footer">
-        <div className="properties-summary">
-          {loading ? (
-            <span>Loading properties...</span>
-          ) : (
-            <span>
-              Showing {properties.length} properties
-              {searchQuery && ` for "${searchQuery}"`}
-              {Object.keys(filters).length > 0 && ' (filtered)'}
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
+  if (error) {
+    return (
+      <div className="map-view error" style
