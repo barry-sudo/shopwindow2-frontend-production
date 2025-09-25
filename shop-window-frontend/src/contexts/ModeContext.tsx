@@ -1,74 +1,71 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { DataSourceType, ModeContext as IModeContext } from '../types/models';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-// Context definition
-const ModeContext = createContext<IModeContext | undefined>(undefined);
-
-// Hook for consuming the mode context
-export const useMode = (): IModeContext => {
-  const context = useContext(ModeContext);
-  if (!context) {
-    throw new Error('useMode must be used within a ModeProvider');
-  }
-  return context;
-};
-
-interface ModeProviderProps {
-  children: ReactNode;
-  defaultMode?: DataSourceType;
+// Types
+interface ModeContextType {
+  isVerifiedMode: boolean;
+  toggleMode: () => void;
+  setVerifiedMode: (verified: boolean) => void;
 }
 
-export const ModeProvider: React.FC<ModeProviderProps> = ({ 
-  children, 
-  defaultMode = DataSourceType.VERIFIED 
-}) => {
-  const [mode, setMode] = useState<DataSourceType>(defaultMode);
+// Create context with default values
+const ModeContext = createContext<ModeContextType | undefined>(undefined);
 
-  const toggleMode = useCallback(() => {
-    setMode(prevMode => 
-      prevMode === DataSourceType.VERIFIED 
-        ? DataSourceType.SCENARIO 
-        : DataSourceType.VERIFIED
-    );
+// Props for the provider
+interface ModeProviderProps {
+  children: ReactNode;
+}
+
+// Mode Provider component
+export const ModeProvider: React.FC<ModeProviderProps> = ({ children }) => {
+  // Default to Verified Mode (true = Verified, false = Scenario)
+  const [isVerifiedMode, setIsVerifiedMode] = useState<boolean>(true);
+
+  // Toggle between modes
+  const toggleMode = () => {
+    setIsVerifiedMode(prev => !prev);
+  };
+
+  // Direct setter for mode
+  const setVerifiedMode = (verified: boolean) => {
+    setIsVerifiedMode(verified);
+  };
+
+  // Apply CSS class to body for global styling
+  useEffect(() => {
+    const body = document.body;
+    
+    if (isVerifiedMode) {
+      body.classList.add('verified-mode');
+      body.classList.remove('scenario-mode');
+      console.log('🔒 Switched to Verified Mode - Authoritative data display');
+    } else {
+      body.classList.add('scenario-mode');
+      body.classList.remove('verified-mode');
+      console.log('📊 Switched to Scenario Mode - Analysis workspace');
+    }
+
+    // Cleanup function
+    return () => {
+      body.classList.remove('verified-mode', 'scenario-mode');
+    };
+  }, [isVerifiedMode]);
+
+  // Store mode in localStorage for persistence
+  useEffect(() => {
+    const savedMode = localStorage.getItem('shopwindow_mode');
+    if (savedMode !== null) {
+      setIsVerifiedMode(savedMode === 'verified');
+    }
   }, []);
 
-  const isScenarioMode = mode === DataSourceType.SCENARIO;
+  useEffect(() => {
+    localStorage.setItem('shopwindow_mode', isVerifiedMode ? 'verified' : 'scenario');
+  }, [isVerifiedMode]);
 
-  // Apply mode-specific CSS custom properties to document root
-  React.useEffect(() => {
-    const root = document.documentElement;
-    
-    if (isScenarioMode) {
-      // Apply scenario mode CSS variables
-      root.style.setProperty('--current-mode-primary', 'var(--color-scenario)');
-      root.style.setProperty('--current-mode-bg', 'var(--color-scenario-bg)');
-      root.style.setProperty('--current-mode-border', 'var(--color-scenario-border)');
-      root.style.setProperty('--current-mode-hover', 'var(--color-scenario-hover)');
-      
-      // Add scenario mode class to body for component-level styling
-      document.body.classList.add('scenario-mode');
-      document.body.classList.remove('verified-mode');
-      
-      console.log('🔧 Switched to Scenario Mode - Analysis workspace activated');
-    } else {
-      // Apply verified mode CSS variables
-      root.style.setProperty('--current-mode-primary', 'var(--color-primary)');
-      root.style.setProperty('--current-mode-bg', '#ffffff');
-      root.style.setProperty('--current-mode-border', 'var(--color-neutral-200)');
-      root.style.setProperty('--current-mode-hover', 'var(--color-primary-hover)');
-      
-      // Add verified mode class to body
-      document.body.classList.add('verified-mode');
-      document.body.classList.remove('scenario-mode');
-      
-      console.log('✅ Switched to Verified Mode - Authoritative data display');
-    }
-  }, [isScenarioMode]);
-
-  const contextValue: IModeContext = {
-    mode,
+  const contextValue: ModeContextType = {
+    isVerifiedMode,
     toggleMode,
-    isScenarioMode
+    setVerifiedMode,
   };
 
   return (
@@ -77,3 +74,20 @@ export const ModeProvider: React.FC<ModeProviderProps> = ({
     </ModeContext.Provider>
   );
 };
+
+// Custom hook to use the mode context
+export const useModeContext = (): ModeContextType => {
+  const context = useContext(ModeContext);
+  
+  if (context === undefined) {
+    throw new Error('useModeContext must be used within a ModeProvider');
+  }
+  
+  return context;
+};
+
+// Export the context itself for advanced usage
+export { ModeContext };
+
+// Default export
+export default ModeProvider;
