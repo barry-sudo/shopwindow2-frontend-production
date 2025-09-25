@@ -30,6 +30,7 @@ export enum DataSourceType {
   SCENARIO = 'scenario'
 }
 
+// Updated Property interface for hook compatibility
 export interface Property {
   id: string;
   name: string;
@@ -38,11 +39,53 @@ export interface Property {
   owner: string;
   property_manager: string;
   gla_total: number; // Gross Leasable Area in sq ft
-  coordinates: Coordinates;
+  coordinates: Coordinates; // This is what useGoogleMaps hook expects
   year_built?: number;
   last_renovated?: number;
   parking_spaces?: number;
   anchor_tenants?: string[];
+  created_at: string;
+  updated_at: string;
+  
+  // Additional fields for compatibility with existing components
+  square_footage?: number; // Alias for gla_total
+  occupancy_rate?: number;
+  data_quality_score?: number;
+  tenant_count?: number;
+  
+  // Django API compatibility
+  location?: {
+    type: 'Point';
+    coordinates: [number, number]; // [lng, lat] - Django format
+  };
+}
+
+// Shopping Center interface (for Django API compatibility)
+export interface ShoppingCenter {
+  id: number;
+  shopping_center_name: string;
+  address_street?: string;
+  address_city?: string;
+  address_state?: string;
+  address_zip?: string;
+  latitude?: string;
+  longitude?: string;
+  location?: {
+    type: 'Point';
+    coordinates: [number, number]; // [lng, lat]
+  };
+  total_gla?: number;
+  center_type?: string;
+  owner?: string;
+  property_manager?: string;
+  tenant_count: number;
+  occupancy_rate: number;
+  data_quality_score: number;
+  quality_score_display: {
+    score: number;
+    label: string;
+    percentage: string;
+  };
   created_at: string;
   updated_at: string;
 }
@@ -74,6 +117,16 @@ export interface Tenant {
   website?: string;
   created_at: string;
   updated_at: string;
+  
+  // Django API compatibility fields
+  tenant_name?: string;
+  tenant_suite_number?: string;
+  shopping_center?: number;
+  occupancy_status?: 'OCCUPIED' | 'VACANT' | 'PENDING' | 'UNKNOWN';
+  is_anchor?: boolean;
+  retail_category?: string[];
+  ownership_type?: string;
+  lease_status?: string;
 }
 
 export interface DataSource {
@@ -112,6 +165,15 @@ export interface PaginatedResponse<T> {
   count: number;
   next?: string;
   previous?: string;
+}
+
+// Enhanced API Error interface for hooks compatibility
+export interface ApiError {
+  message: string;
+  code?: string;
+  field_errors?: Record<string, string[]>;
+  status_code: number;
+  details?: string; // Added for useApi hook compatibility
 }
 
 // Form Types
@@ -163,7 +225,7 @@ export interface ModeContext {
   isScenarioMode: boolean;
 }
 
-// Filter and Search Types
+// Enhanced Filter and Search Types
 export interface PropertyFilters {
   property_type?: PropertyType[];
   min_gla?: number;
@@ -173,6 +235,15 @@ export interface PropertyFilters {
   owner?: string[];
   has_vacancy?: boolean;
   search_query?: string;
+  
+  // Additional filter fields for component compatibility
+  searchTerm?: string;
+  minSquareFootage?: number;
+  maxSquareFootage?: number;
+  minOccupancy?: number;
+  maxOccupancy?: number;
+  minDataQuality?: number;
+  centerType?: string;
 }
 
 export interface SearchResult {
@@ -196,14 +267,6 @@ export interface MapViewProps {
   bounds?: MapBounds;
   zoom?: number;
   center?: Coordinates;
-}
-
-// Error Types
-export interface ApiError {
-  message: string;
-  code?: string;
-  field_errors?: Record<string, string[]>;
-  status_code: number;
 }
 
 export interface ValidationError {
@@ -264,3 +327,33 @@ export interface NavigationTab {
 
 // Export utility type for ensuring all required props
 export type RequiredProps<T, K extends keyof T> = T & Required<Pick<T, K>>;
+
+// Hook-specific types
+export interface UseApiOptions {
+  immediate?: boolean;
+  onSuccess?: (data: any) => void;
+  onError?: (error: ApiError) => void;
+}
+
+export interface UseApiState<T> {
+  data: T | null;
+  loading: boolean;
+  error: ApiError | null;
+}
+
+// Google Maps hook types
+export interface UseGoogleMapsOptions {
+  center: Coordinates;
+  zoom: number;
+  onBoundsChanged?: (bounds: google.maps.LatLngBounds) => void;
+  onCenterChanged?: (center: Coordinates) => void;
+  onZoomChanged?: (zoom: number) => void;
+}
+
+// Scenario storage hook types
+export interface ScenarioStorageData {
+  [propertyId: string]: {
+    [field: string]: any;
+    lastModified: string;
+  };
+}
