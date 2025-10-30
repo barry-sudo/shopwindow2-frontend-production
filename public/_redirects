@@ -1,0 +1,17 @@
+# Render.com SPA Redirects for Shop Window
+# Handles client-side routing for React Router
+
+# Redirect all routes to index.html for SPA handling
+/*    /index.html   200
+
+# API routes should not be redirected (future-proofing)
+/api/*  /api/:splat  200
+
+# Static assets should be served directly
+/static/*  /static/:splat  200
+/assets/*  /assets/:splat  200
+
+# Favicon and manifest files
+/favicon.ico  /favicon.ico  200
+/manifest.json  /manifest.json  200
+/robots.txt  /robots.txt  200

@@ -1,0 +1,23 @@
+# Shop Window - Retail CRE Intelligence Platform
+# SEO and Web Crawler Instructions
+
+User-agent: *
+Allow: /
+
+# Allow all major search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Disallow admin and private areas (future-proofing)
+Disallow: /admin/
+Disallow: /_redirects
+Disallow: /.env
+
+# Sitemap location (future implementation)
+# Sitemap: https://shopwindow.com/sitemap.xml
