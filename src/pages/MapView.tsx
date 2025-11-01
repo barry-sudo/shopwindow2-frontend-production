@@ -70,8 +70,11 @@ export const MapView: React.FC = () => {
         })
         .map(property => ({
           ...property,
-          latitude: property.latitude!,   // Already a number, just assert non-null
-          longitude: property.longitude!, // Already a number, just assert non-null
+          // FIXED: Convert DecimalField strings to numbers for Google Maps
+          // Django REST Framework serializes DecimalField as strings to preserve precision
+          // But Google Maps requires actual number types for lat/lng coordinates
+          latitude: parseFloat(property.latitude as any),
+          longitude: parseFloat(property.longitude as any),
           geocoded: true,                 // Required by GeocodedProperty interface
           geocode_source: 'backend' as const // Optional field indicating source
         }));
