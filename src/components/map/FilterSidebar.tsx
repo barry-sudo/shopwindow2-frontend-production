@@ -1,6 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import type { GeocodedProperty } from '../../types/models';
+import { CenterTypes } from '../../types/models';
 import '../../styles/design-tokens.css';
+
+/**
+ * FilterSidebar Component - Map search filters
+ * 
+ * UPDATED: 2025-11-05 - Changed Shopping Center Type to use predefined categories
+ * instead of dynamic extraction from properties data
+ * 
+ * SAVE TO: /Users/barrygilbert/Documents/shopwindow/frontend/src/components/map/FilterSidebar.tsx
+ */
 
 interface FilterSidebarProps {
   properties: GeocodedProperty[];
@@ -28,15 +38,14 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   });
 
   // Extract unique values from properties for each filter
+  // NOTE: centerTypes now uses predefined array instead of dynamic extraction
   const filterOptions = useMemo(() => {
-    const centerTypes = new Set<string>();
     const owners = new Set<string>();
     const propertyManagers = new Set<string>();
     const states = new Set<string>();
     const counties = new Set<string>();
 
     properties.forEach(property => {
-      if (property.center_type) centerTypes.add(property.center_type);
       if (property.owner) owners.add(property.owner);
       if (property.property_manager) propertyManagers.add(property.property_manager);
       if (property.address_state) states.add(property.address_state);
@@ -44,7 +53,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
     });
 
     return {
-      centerTypes: Array.from(centerTypes).sort(),
+      centerTypes: [...CenterTypes], // Use predefined categories from models.ts
       owners: Array.from(owners).sort(),
       propertyManagers: Array.from(propertyManagers).sort(),
       states: Array.from(states).sort(),
