@@ -21,7 +21,7 @@ export const EntryPoints: React.FC<EntryPointsProps> = ({ onEntryPointClick }) =
     {
       icon: '🏢',
       title: 'Analyze Property',
-      description: 'Deep dive into individual property performance, tenant mix, and market position',
+      description: 'Examine individual property performance, tenant mix, and demographics',
       key: 'analyze',
       onClick: () => {
         setActiveEntry('analyze');
@@ -31,7 +31,7 @@ export const EntryPoints: React.FC<EntryPointsProps> = ({ onEntryPointClick }) =
     {
       icon: '📊',
       title: 'Portfolio Overview',
-      description: 'Compare multiple properties and analyze portfolio performance',
+      description: 'Analyze portfolio performance',
       key: 'portfolio',
       onClick: () => {
         setActiveEntry('portfolio');
@@ -41,7 +41,7 @@ export const EntryPoints: React.FC<EntryPointsProps> = ({ onEntryPointClick }) =
     {
       icon: '💰',
       title: 'Financial Modeling',
-      description: 'Create scenarios and investment thesis analysis',
+      description: 'Deep dive into financial scenarios and investment analyses',
       key: 'financial',
       onClick: () => {
         setActiveEntry('financial');
@@ -66,7 +66,7 @@ export const EntryPoints: React.FC<EntryPointsProps> = ({ onEntryPointClick }) =
             key={index}
             onClick={entry.onClick}
             style={{
-              backgroundColor: isActive ? '#DCA1A1' : 'var(--color-white)',
+              backgroundColor: isActive ? '#9d9ef1ff' : 'var(--color-white)',
               padding: '30px',
               borderRadius: 'var(--radius-lg)',
               textAlign: 'center',
