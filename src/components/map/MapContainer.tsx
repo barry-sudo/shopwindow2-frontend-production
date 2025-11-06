@@ -1,16 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { GeocodedProperty } from '../../types/models';
+import { CenterTypeColors } from '../../types/models';
 import '../../styles/design-tokens.css';
 
 /**
  * MapContainer Component - Google Maps integration with interactive markers
  * 
  * Features:
- * - Renders property markers on Google Maps
+ * - Renders property markers on Google Maps with color-coding by center type
  * - Visual selection state (orange + scaled up)
  * - Hover effects (scale up 1.2x)
  * - Click handling for property selection
  * - Zoom behavior controlled by parent (MapView)
+ * - Special border logic for white/black markers (visibility on map)
+ * 
+ * UPDATED: 2025-11-05 - Added color-coded markers by center type
  * 
  * SAVE TO: /Users/barrygilbert/Documents/shopwindow/frontend/src/components/map/MapContainer.tsx
  */
@@ -102,8 +106,19 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     }
   }, [isLoaded, map, onMapReady]);
 
-  // Helper function to create marker icon
-  const createMarkerIcon = (isSelected: boolean, isHovered: boolean = false) => {
+  /**
+   * Helper function to create marker icon with color-coding by center type
+   * UPDATED: 2025-11-05 - Added centerType parameter and color logic
+   * 
+   * @param centerType - Shopping center type (determines marker color)
+   * @param isSelected - Whether marker is currently selected (orange override)
+   * @param isHovered - Whether marker is being hovered (scale up)
+   */
+  const createMarkerIcon = (
+    centerType: string | null, 
+    isSelected: boolean, 
+    isHovered: boolean = false
+  ) => {
     let scale = 6; // Default size
     
     if (isSelected && isHovered) {
@@ -114,13 +129,35 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       scale = 7.2; // Just hovered
     }
     
+    // Get color based on center type (default to blue if unknown/null)
+    const fillColor = centerType && CenterTypeColors[centerType] 
+      ? CenterTypeColors[centerType] 
+      : '#2c5aa0'; // Default blue for unknown types
+    
+    // Special border logic for white and black markers (visibility)
+    let strokeColor = '#ffffff'; // Default white border
+    let strokeWeight = 3;
+    
+    if (fillColor === '#FFFFFF') {
+      // White marker gets black border for visibility on light map
+      strokeColor = '#000000';
+      strokeWeight = 3;
+    } else if (fillColor === '#000000') {
+      // Black marker gets white border for visibility
+      strokeColor = '#FFFFFF';
+      strokeWeight = 3;
+    }
+    
+    // Selected markers get orange regardless of center type
+    const finalFillColor = isSelected ? '#f39c12' : fillColor;
+    
     return {
       path: google.maps.SymbolPath.CIRCLE,
       scale: scale,
-      fillColor: isSelected ? '#f39c12' : '#2c5aa0',
+      fillColor: finalFillColor,
       fillOpacity: 1,
-      strokeColor: '#ffffff',
-      strokeWeight: 3
+      strokeColor: strokeColor,
+      strokeWeight: strokeWeight
     };
   };
 
@@ -156,13 +193,13 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       const isSelected = selectedPropertyId === property.id;
       
       if (!marker) {
-        // Create new marker
+        // Create new marker with color based on center type
         // FIXED: Use { lat, lng } object instead of coordinates tuple
         marker = new google.maps.Marker({
           position: { lat: property.latitude, lng: property.longitude },
           map,
           title: property.shopping_center_name,
-          icon: createMarkerIcon(isSelected)
+          icon: createMarkerIcon(property.center_type, isSelected)
         });
 
         // Add click listener - zoom/pan logic now handled by parent (MapView)
@@ -176,19 +213,19 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         marker.addListener('mouseover', () => {
           if (!marker) return;
           const currentlySelected = selectedPropertyId === property.id;
-          marker.setIcon(createMarkerIcon(currentlySelected, true));
+          marker.setIcon(createMarkerIcon(property.center_type, currentlySelected, true));
         });
 
         marker.addListener('mouseout', () => {
           if (!marker) return;
           const currentlySelected = selectedPropertyId === property.id;
-          marker.setIcon(createMarkerIcon(currentlySelected, false));
+          marker.setIcon(createMarkerIcon(property.center_type, currentlySelected, false));
         });
 
         currentMarkers.set(property.id, marker);
       } else {
         // Update existing marker icon if selection state changed
-        marker.setIcon(createMarkerIcon(isSelected));
+        marker.setIcon(createMarkerIcon(property.center_type, isSelected));
       }
     });
 
@@ -204,13 +241,18 @@ export const MapContainer: React.FC<MapContainerProps> = ({
 
     currentMarkers.forEach((marker, propertyId) => {
       const isSelected = selectedPropertyId === propertyId;
-      marker.setIcon(createMarkerIcon(isSelected));
       
-      if (isSelected) {
-        console.log('Marker', propertyId, 'is now SELECTED (should be orange)');
+      // Find the property to get its center_type
+      const property = properties.find(p => p.id === propertyId);
+      if (property) {
+        marker.setIcon(createMarkerIcon(property.center_type, isSelected));
+        
+        if (isSelected) {
+          console.log('Marker', propertyId, 'is now SELECTED (should be orange)');
+        }
       }
     });
-  }, [selectedPropertyId]);
+  }, [selectedPropertyId, properties]);
 
   return (
     <div
