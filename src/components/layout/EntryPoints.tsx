@@ -66,7 +66,7 @@ export const EntryPoints: React.FC<EntryPointsProps> = ({ onEntryPointClick }) =
             key={index}
             onClick={entry.onClick}
             style={{
-              backgroundColor: isActive ? '#9d9ef1ff' : 'var(--color-white)',
+              backgroundColor: isActive ? '#fff1bf' : 'var(--color-white)',
               padding: '30px',
               borderRadius: 'var(--radius-lg)',
               textAlign: 'center',
@@ -90,7 +90,7 @@ export const EntryPoints: React.FC<EntryPointsProps> = ({ onEntryPointClick }) =
             <div style={{
               width: '60px',
               height: '60px',
-              backgroundColor: '#fff1bf',
+              backgroundColor: '#ffffff',
               borderRadius: 'var(--radius-full)',
               margin: '0 auto 20px',
               display: 'flex',
