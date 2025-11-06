@@ -3,6 +3,7 @@
  * UPDATED: 2025-10-10 to match backend serializers exactly
  * UPDATED: 2025-10-22 to add avg_base_rent_psf field
  * UPDATED: 2025-10-23 to add lease_commence field (normalized from lease_start)
+ * UPDATED: 2025-11-05 to update CenterTypes and add CenterTypeColors mapping
  * 
  * SAVE TO: /Users/barrygilbert/Documents/shopwindow/frontend/src/types/models.ts
  * 
@@ -190,28 +191,42 @@ export interface MapViewState {
 // ===== ENUMS & CONSTANTS =====
 
 /**
- * Shopping Center Types based on ICSC (International Council of Shopping Centers)
- * U.S. Shopping-Center Classification and Characteristics (January 2017)
+ * Shopping Center Types - Updated 2025-11-05
+ * New 9-category classification system for Shop Window
  */
 export const CenterTypes = [
-  // General-Purpose Centers
-  'Super-Regional Mall',
-  'Regional Mall',
-  'Community Center',
+  'Standalone Retail',
   'Neighborhood Center',
-  'Strip/Convenience',
-  
-  // Specialized-Purpose Centers
+  'Neighborhood Service Center',
+  'Grocery Anchored Neighborhood Center',
+  'Community Center',
+  'Lifestyle Center',
   'Power Center',
-  'Lifestyle',
-  'Factory Outlet',
-  'Theme/Festival',
-  
-  // Limited-Purpose Property
-  'Airport Retail',
+  'Regional Shopping Center',
+  'Super-Regional Center',
 ] as const;
 
 export type CenterType = typeof CenterTypes[number];
+
+/**
+ * Color mapping for shopping center type markers - Added 2025-11-05
+ * Maps each center type to its designated marker color on the map
+ * 
+ * Special cases:
+ * - Regional Shopping Center (white) will have black border for visibility
+ * - Super-Regional Center (black) will have white border for visibility
+ */
+export const CenterTypeColors: Record<string, string> = {
+  'Standalone Retail': '#808080',        // Grey
+  'Neighborhood Center': '#800080',      // Purple
+  'Neighborhood Service Center': '#008080', // Teal
+  'Grocery Anchored Neighborhood Center': '#FF0000', // Red
+  'Community Center': '#008000',         // Green
+  'Lifestyle Center': '#0000FF',         // Blue
+  'Power Center': '#FFA500',            // Orange
+  'Regional Shopping Center': '#FFFFFF', // White (with black border)
+  'Super-Regional Center': '#000000',    // Black (with white border)
+};
 
 /**
  * 8-Category Tenant Classification System
