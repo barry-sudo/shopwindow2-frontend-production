@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../../styles/design-tokens.css';
 
 interface EntryPoint {
-  icon: string;
+  icon: string; // Now holds the image path instead of emoji
   title: string;
   description: string;
   key: string;
@@ -13,15 +13,25 @@ interface EntryPointsProps {
   onEntryPointClick?: (entryPoint: string) => void;
 }
 
+/**
+ * EntryPoints Component - Three main entry cards on dashboard
+ * 
+ * UPDATED: Now uses custom 120x120px icon images instead of emojis
+ * - Icons are 240x240px source files (retina) displayed at 120x120px
+ * - Transparent PNG images with black silhouettes
+ * - Images located in /public/icons/ directory
+ * 
+ * SAVE TO: /Users/barrygilbert/Documents/shopwindow/frontend/src/components/layout/EntryPoints.tsx
+ */
 export const EntryPoints: React.FC<EntryPointsProps> = ({ onEntryPointClick }) => {
   // Track which entry point is currently active (default: 'analyze')
   const [activeEntry, setActiveEntry] = useState<string>('analyze');
 
   const entryPoints: EntryPoint[] = [
     {
-      icon: '🏢',
+      icon: '/icons/analyze-property.png',
       title: 'Analyze Property',
-      description: 'Examine individual property performance, tenant mix, and demographics',
+      description: 'Deep dive into individual property performance, tenant mix, and market position',
       key: 'analyze',
       onClick: () => {
         setActiveEntry('analyze');
@@ -29,9 +39,9 @@ export const EntryPoints: React.FC<EntryPointsProps> = ({ onEntryPointClick }) =
       }
     },
     {
-      icon: '📊',
+      icon: '/icons/portfolio-overview.png',
       title: 'Portfolio Overview',
-      description: 'Analyze portfolio performance',
+      description: 'Compare multiple properties and analyze portfolio performance',
       key: 'portfolio',
       onClick: () => {
         setActiveEntry('portfolio');
@@ -39,9 +49,9 @@ export const EntryPoints: React.FC<EntryPointsProps> = ({ onEntryPointClick }) =
       }
     },
     {
-      icon: '💰',
+      icon: '/icons/financial-modeling.png',
       title: 'Financial Modeling',
-      description: 'Deep dive into financial scenarios and investment analyses',
+      description: 'Create scenarios and investment thesis analysis',
       key: 'financial',
       onClick: () => {
         setActiveEntry('financial');
@@ -66,7 +76,7 @@ export const EntryPoints: React.FC<EntryPointsProps> = ({ onEntryPointClick }) =
             key={index}
             onClick={entry.onClick}
             style={{
-              backgroundColor: isActive ? '#fff1bf' : 'var(--color-white)',
+              backgroundColor: isActive ? '#FFFFc5' : 'var(--color-white)',
               padding: '30px',
               borderRadius: 'var(--radius-lg)',
               textAlign: 'center',
@@ -86,20 +96,18 @@ export const EntryPoints: React.FC<EntryPointsProps> = ({ onEntryPointClick }) =
               e.currentTarget.style.borderColor = 'transparent';
             }}
           >
-            {/* Icon */}
-            <div style={{
-              width: '60px',
-              height: '60px',
-              backgroundColor: '#ffffff',
-              borderRadius: 'var(--radius-full)',
-              margin: '0 auto 20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '28px'
-            }}>
-              {entry.icon}
-            </div>
+            {/* Icon - UPDATED: Now displays custom image at 120x120px */}
+            <img 
+              src={entry.icon}
+              alt={`${entry.title} icon`}
+              style={{
+                width: '120px',
+                height: '120px',
+                display: 'block',
+                margin: '0 auto 24px',
+                objectFit: 'contain', // Ensures image fits without distortion
+              }}
+            />
 
             {/* Title */}
             <h3 style={{
